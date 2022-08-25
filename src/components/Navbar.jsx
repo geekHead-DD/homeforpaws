@@ -49,7 +49,7 @@ function Navbar() {
               Offers
             </p>
           </li>
-          <li className='navbarListItem' onClick={() => navigate('/profile')}>
+          <li className='navbarListItem' onClick={() => navigate('/sign-in')}>
             <PersonOutlineIcon
               fill={pathMatchRoute('/profile') ? '#0080FF' : '#8f8f8f'}
               width='36px'
