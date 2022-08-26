@@ -24,6 +24,7 @@ export const useAuthStatus = () => {
 
   return { loggedIn, checkingStatus }
 }
+
 // Protected routes in v6
 // https://stackoverflow.com/questions/65505665/protected-route-with-firebase
 

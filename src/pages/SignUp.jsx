@@ -48,11 +48,11 @@ function SignUp() {
         displayName: name,
       })
 
-      const formDataCopy = { ...formData } //copy of form data
-      delete formDataCopy.password //delete password from form data 
+      const formDataCopy = { ...formData }
+      delete formDataCopy.password
       formDataCopy.timestamp = serverTimestamp()
 
-      await setDoc(doc(db, 'users', user.uid), formDataCopy) //add user to user collection
+      await setDoc(doc(db, 'users', user.uid), formDataCopy)
 
       navigate('/')
     } catch (error) {
