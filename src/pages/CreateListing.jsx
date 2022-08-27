@@ -6,7 +6,7 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from 'firebase/storage'
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { addDoc, collection, connectFirestoreEmulator, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase.config'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -18,12 +18,13 @@ function CreateListing() {
   const [geolocationEnabled, setGeolocationEnabled] = useState(true)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
-    type: 'rent',
+    type: 'adoption',
     name: '',
     bedrooms: 1,
-    bathrooms: 1,
-    parking: false,
-    furnished: false,
+    bathrooms: 0,
+    parking: true,
+    gender : 'female',
+    furnished: true,
     address: '',
     offer: false,
     regularPrice: 0,
@@ -39,6 +40,7 @@ function CreateListing() {
     bedrooms,
     bathrooms,
     parking,
+    gender,
     furnished,
     address,
     offer,
@@ -221,8 +223,17 @@ function CreateListing() {
 
       <main>
         <form onSubmit={onSubmit}>
-          <label className='formLabel'>Sell / Rent</label>
+          <label className='formLabel'>Adoption / Sell</label>
           <div className='formButtons'>
+          <button
+              type='button'
+              className={type === 'adoption' ? 'formButtonActive' : 'formButton'}
+              id='type'
+              value='adoption'
+              onClick={onMutate}
+            >
+              Adoption
+            </button>
             <button
               type='button'
               className={type === 'sale' ? 'formButtonActive' : 'formButton'}
@@ -232,18 +243,9 @@ function CreateListing() {
             >
               Sell
             </button>
-            <button
-              type='button'
-              className={type === 'rent' ? 'formButtonActive' : 'formButton'}
-              id='type'
-              value='rent'
-              onClick={onMutate}
-            >
-              Rent
-            </button>
           </div>
 
-          <label className='formLabel'>Name</label>
+          <label className='formLabel'>Name / Breed</label>
           <input
             className='formInputName'
             type='text'
@@ -257,7 +259,7 @@ function CreateListing() {
 
           <div className='formRooms flex'>
             <div>
-              <label className='formLabel'>Bedrooms</label>
+              <label className='formLabel'>Age</label>
               <input
                 className='formInputSmall'
                 type='number'
@@ -270,21 +272,21 @@ function CreateListing() {
               />
             </div>
             <div>
-              <label className='formLabel'>Bathrooms</label>
+              <label className='formLabel'>Puppies</label>
               <input
                 className='formInputSmall'
                 type='number'
                 id='bathrooms'
                 value={bathrooms}
                 onChange={onMutate}
-                min='1'
+                min='0'
                 max='50'
                 required
               />
             </div>
           </div>
 
-          <label className='formLabel'>Parking spot</label>
+          <label className='formLabel'>Neutered</label>
           <div className='formButtons'>
             <button
               className={parking ? 'formButtonActive' : 'formButton'}
@@ -310,7 +312,34 @@ function CreateListing() {
             </button>
           </div>
 
-          <label className='formLabel'>Furnished</label>
+          <label className='formLabel'>Gender</label>
+          <div className='formButtons'>
+            <button
+              className={gender ? 'formButtonActive' : 'formButton'}
+              type='button'
+              id='gender'
+              value={true}
+              onClick={onMutate}
+              min='1'
+              max='50'
+            >
+              Male
+            </button>
+            <button
+              className={
+                !gender && gender !== null ? 'formButtonActive' : 'formButton'
+              }
+              type='button'
+              id='gender'
+              value={false}
+              onClick={onMutate}
+            >
+              Female
+            </button>
+          </div>
+
+
+          <label className='formLabel'>Healthy</label>
           <div className='formButtons'>
             <button
               className={furnished ? 'formButtonActive' : 'formButton'}
@@ -372,61 +401,64 @@ function CreateListing() {
               </div>
             </div>
           )}
-
-          <label className='formLabel'>Offer</label>
-          <div className='formButtons'>
-            <button
-              className={offer ? 'formButtonActive' : 'formButton'}
-              type='button'
-              id='offer'
-              value={true}
-              onClick={onMutate}
-            >
-              Yes
-            </button>
-            <button
-              className={
-                !offer && offer !== null ? 'formButtonActive' : 'formButton'
-              }
-              type='button'
-              id='offer'
-              value={false}
-              onClick={onMutate}
-            >
-              No
-            </button>
-          </div>
-
-          <label className='formLabel'>Regular Price</label>
-          <div className='formPriceDiv'>
-            <input
-              className='formInputSmall'
-              type='number'
-              id='regularPrice'
-              value={regularPrice}
-              onChange={onMutate}
-              min='50'
-              max='750000000'
-              required
-            />
-            {type === 'rent' && <p className='formPriceText'>$ / Month</p>}
-          </div>
-
-          {offer && (
+          {type==='sale'&&
             <>
-              <label className='formLabel'>Discounted Price</label>
-              <input
-                className='formInputSmall'
-                type='number'
-                id='discountedPrice'
-                value={discountedPrice}
-                onChange={onMutate}
-                min='50'
-                max='750000000'
-                required={offer}
-              />
-            </>
-          )}
+              <label className='formLabel'>Offer</label>
+              <div className='formButtons'>
+                <button
+                  className={offer ? 'formButtonActive' : 'formButton'}
+                  type='button'
+                  id='offer'
+                  value={true}
+                  onClick={onMutate}
+                >
+                  Yes
+                </button>
+                <button
+                  className={
+                    !offer && offer !== null ? 'formButtonActive' : 'formButton'
+                  }
+                  type='button'
+                  id='offer'
+                  value={false}
+                  onClick={onMutate}
+                >
+                  No
+                </button>
+              </div>
+
+              <label className='formLabel'>Regular Price</label>
+              <div className='formPriceDiv'>
+                <input
+                  className='formInputSmall'
+                  type='number'
+                  id='regularPrice'
+                  value={regularPrice}
+                  onChange={onMutate}
+                  min='50'
+                  max='750000000'
+                  required
+                />
+                {type === 'sale' && <p className='formPriceText'>$ / Month</p>}
+              </div>
+
+              {offer && (
+                <>
+                  <label className='formLabel'>Discounted Price</label>
+                  <input
+                    className='formInputSmall'
+                    type='number'
+                    id='discountedPrice'
+                    value={discountedPrice}
+                    onChange={onMutate}
+                    min='50'
+                    max='750000000'
+                    required={offer}
+                  />
+                </>
+              )}
+          </>}
+          
 
           <label className='formLabel'>Images</label>
           <p className='imagesInfo'>
