@@ -6,7 +6,7 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from 'firebase/storage'
-import { doc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore'
+import {  doc, updateDoc,getDoc, connectFirestoreEmulator, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase.config'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -15,19 +15,20 @@ import Spinner from '../components/Spinner'
 
 function EditListing() {
   // eslint-disable-next-line
-  const [geolocationEnabled, setGeolocationEnabled] = useState(true)
+  const [geolocationEnabled, setGeolocationEnabled] = useState(false)
   const [loading, setLoading] = useState(false)
   const [listing, setListing] = useState(false)
   const [formData, setFormData] = useState({
-    type: 'rent',
+    type: 'adoption',
     name: '',
     bedrooms: 1,
-    bathrooms: 1,
-    parking: false,
-    furnished: false,
+    bathrooms: 0,
+    parking: true,
+    gender : 'female',
+    furnished: true,
     address: '',
     offer: false,
-    regularPrice: 0,
+    regularPrice: 1,
     discountedPrice: 0,
     images: {},
     latitude: 0,
@@ -40,6 +41,7 @@ function EditListing() {
     bedrooms,
     bathrooms,
     parking,
+    gender,
     furnished,
     address,
     offer,
@@ -52,8 +54,8 @@ function EditListing() {
 
   const auth = getAuth()
   const navigate = useNavigate()
-  const params = useParams()
   const isMounted = useRef(true)
+  const params = useParams()
 
   // Redirect if listing is not user's
   useEffect(() => {
@@ -63,8 +65,8 @@ function EditListing() {
     }
   })
 
-  // Fetch listing to edit
-  useEffect(() => {
+   // Fetch listing to edit
+   useEffect(() => {
     setLoading(true)
     const fetchListing = async () => {
       const docRef = doc(db, 'listings', params.listingId)
@@ -82,7 +84,7 @@ function EditListing() {
     fetchListing()
   }, [params.listingId, navigate])
 
-  // Sets userRef to logged in user
+
   useEffect(() => {
     if (isMounted) {
       onAuthStateChanged(auth, (user) => {
@@ -253,8 +255,17 @@ function EditListing() {
 
       <main>
         <form onSubmit={onSubmit}>
-          <label className='formLabel'>Sell / Rent</label>
+          <label className='formLabel'>Adoption / Sell</label>
           <div className='formButtons'>
+          <button
+              type='button'
+              className={type === 'adoption' ? 'formButtonActive' : 'formButton'}
+              id='type'
+              value='adoption'
+              onClick={onMutate}
+            >
+              Adoption
+            </button>
             <button
               type='button'
               className={type === 'sale' ? 'formButtonActive' : 'formButton'}
@@ -264,18 +275,9 @@ function EditListing() {
             >
               Sell
             </button>
-            <button
-              type='button'
-              className={type === 'rent' ? 'formButtonActive' : 'formButton'}
-              id='type'
-              value='rent'
-              onClick={onMutate}
-            >
-              Rent
-            </button>
           </div>
 
-          <label className='formLabel'>Name</label>
+          <label className='formLabel'>Name / Breed</label>
           <input
             className='formInputName'
             type='text'
@@ -289,7 +291,7 @@ function EditListing() {
 
           <div className='formRooms flex'>
             <div>
-              <label className='formLabel'>Bedrooms</label>
+              <label className='formLabel'>Age</label>
               <input
                 className='formInputSmall'
                 type='number'
@@ -302,21 +304,21 @@ function EditListing() {
               />
             </div>
             <div>
-              <label className='formLabel'>Bathrooms</label>
+              <label className='formLabel'>Puppies</label>
               <input
                 className='formInputSmall'
                 type='number'
                 id='bathrooms'
                 value={bathrooms}
                 onChange={onMutate}
-                min='1'
+                min='0'
                 max='50'
                 required
               />
             </div>
           </div>
 
-          <label className='formLabel'>Parking spot</label>
+          <label className='formLabel'>Neutered</label>
           <div className='formButtons'>
             <button
               className={parking ? 'formButtonActive' : 'formButton'}
@@ -342,7 +344,34 @@ function EditListing() {
             </button>
           </div>
 
-          <label className='formLabel'>Furnished</label>
+          <label className='formLabel'>Gender</label>
+          <div className='formButtons'>
+            <button
+              className={gender ? 'formButtonActive' : 'formButton'}
+              type='button'
+              id='gender'
+              value={true}
+              onClick={onMutate}
+              min='1'
+              max='50'
+            >
+              Male
+            </button>
+            <button
+              className={
+                !gender && gender !== null ? 'formButtonActive' : 'formButton'
+              }
+              type='button'
+              id='gender'
+              value={false}
+              onClick={onMutate}
+            >
+              Female
+            </button>
+          </div>
+
+
+          <label className='formLabel'>Healthy</label>
           <div className='formButtons'>
             <button
               className={furnished ? 'formButtonActive' : 'formButton'}
@@ -404,61 +433,64 @@ function EditListing() {
               </div>
             </div>
           )}
-
-          <label className='formLabel'>Offer</label>
-          <div className='formButtons'>
-            <button
-              className={offer ? 'formButtonActive' : 'formButton'}
-              type='button'
-              id='offer'
-              value={true}
-              onClick={onMutate}
-            >
-              Yes
-            </button>
-            <button
-              className={
-                !offer && offer !== null ? 'formButtonActive' : 'formButton'
-              }
-              type='button'
-              id='offer'
-              value={false}
-              onClick={onMutate}
-            >
-              No
-            </button>
-          </div>
-
-          <label className='formLabel'>Regular Price</label>
-          <div className='formPriceDiv'>
-            <input
-              className='formInputSmall'
-              type='number'
-              id='regularPrice'
-              value={regularPrice}
-              onChange={onMutate}
-              min='50'
-              max='750000000'
-              required
-            />
-            {type === 'rent' && <p className='formPriceText'>$ / Month</p>}
-          </div>
-
-          {offer && (
+          {type==='sale'&&
             <>
-              <label className='formLabel'>Discounted Price</label>
-              <input
-                className='formInputSmall'
-                type='number'
-                id='discountedPrice'
-                value={discountedPrice}
-                onChange={onMutate}
-                min='50'
-                max='750000000'
-                required={offer}
-              />
-            </>
-          )}
+              <label className='formLabel'>Offer</label>
+              <div className='formButtons'>
+                <button
+                  className={offer ? 'formButtonActive' : 'formButton'}
+                  type='button'
+                  id='offer'
+                  value={true}
+                  onClick={onMutate}
+                >
+                  Yes
+                </button>
+                <button
+                  className={
+                    !offer && offer !== null ? 'formButtonActive' : 'formButton'
+                  }
+                  type='button'
+                  id='offer'
+                  value={false}
+                  onClick={onMutate}
+                >
+                  No
+                </button>
+              </div>
+
+              <label className='formLabel'>Regular Price</label>
+              <div className='formPriceDiv'>
+                <input
+                  className='formInputSmall'
+                  type='number'
+                  id='regularPrice'
+                  value={regularPrice}
+                  onChange={onMutate}
+                  min='1'
+                  max='7500'
+                  required
+                />
+                {type === 'sale' && <p className='formPriceText'>$ / Month</p>}
+              </div>
+
+              {offer && (
+                <>
+                  <label className='formLabel'>Discounted Price</label>
+                  <input
+                    className='formInputSmall'
+                    type='number'
+                    id='discountedPrice'
+                    value={discountedPrice}
+                    onChange={onMutate}
+                    min='0'
+                    max='7500'
+                    required={offer}
+                  />
+                </>
+              )}
+          </>}
+          
 
           <label className='formLabel'>Images</label>
           <p className='imagesInfo'>
@@ -484,3 +516,4 @@ function EditListing() {
 }
 
 export default EditListing
+
