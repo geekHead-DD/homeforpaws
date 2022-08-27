@@ -32,13 +32,13 @@ function Contact() {
   return (
     <div className='pageContainer'>
       <header>
-        <p className='pageHeader'>Contact Landlord</p>
+        <p className='pageHeader'>Contact</p>
       </header>
 
       {landlord !== null && (
         <main>
           <div className='contactLandlord'>
-            <p className='landlordName'>Contact {landlord?.name}</p>
+            <p className='landlordName'>Posted by: {landlord?.name}</p>
           </div>
 
           <form className='messageForm'>
