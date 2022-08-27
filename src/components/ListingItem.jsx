@@ -17,9 +17,10 @@ function ListingItem({ listing, id, onEdit, onDelete }) {
           className='categoryListingImg'
         />
         <div className='categoryListingDetails'>
-          <p className='categoryListingLocation'>{listing.location}</p>
           <p className='categoryListingName'>{listing.name}</p>
-
+          <p className='categoryListingLocation'>{listing.location}</p>
+          
+          {listing.type==='sale'&&
           <p className='categoryListingPrice'>
             $
             {listing.offer
@@ -29,20 +30,20 @@ function ListingItem({ listing, id, onEdit, onDelete }) {
               : listing.regularPrice
                   .toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-            {listing.type === 'rent' && ' / Month'}
-          </p>
+            {/* {listing.type === 'rent' && ' / Month'} */}
+          </p>}
           <div className='categoryListingInfoDiv'>
             <img width='9%' src={dogageIcon} alt='bath' />
             <p className='categoryListingInfoText'>
-              {listing.age > 1
-                ? `${listing.age} years old`
+              {listing.bedrooms > 1
+                ? `${listing.bedrooms} years old`
                 : '1 year old'}
             </p>
             <img width='9%' src={dogIcon} alt='bed' />
             <p className='categoryListingInfoText'>
               {listing.gender ==='male'
                 ? ''
-                : `${listing.puppies} puppies`}
+                : `${listing.bathrooms} puppies`}
             </p>
           </div>
         </div>

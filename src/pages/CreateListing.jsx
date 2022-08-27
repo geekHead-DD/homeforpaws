@@ -15,7 +15,7 @@ import Spinner from '../components/Spinner'
 
 function CreateListing() {
   // eslint-disable-next-line
-  const [geolocationEnabled, setGeolocationEnabled] = useState(true)
+  const [geolocationEnabled, setGeolocationEnabled] = useState(false)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     type: 'adoption',
@@ -27,7 +27,7 @@ function CreateListing() {
     furnished: true,
     address: '',
     offer: false,
-    regularPrice: 0,
+    regularPrice: 1,
     discountedPrice: 0,
     images: {},
     latitude: 0,
@@ -253,7 +253,7 @@ function CreateListing() {
             value={name}
             onChange={onMutate}
             maxLength='32'
-            minLength='10'
+            minLength='2'
             required
           />
 
@@ -435,11 +435,13 @@ function CreateListing() {
                   id='regularPrice'
                   value={regularPrice}
                   onChange={onMutate}
-                  min='50'
-                  max='750000000'
+                  min='1'
+                  max='7500'
                   required
                 />
-                {type === 'sale' && <p className='formPriceText'>$ / Month</p>}
+                {type === 'sale' && <p className='formPriceText'>$ 
+                
+                </p>}
               </div>
 
               {offer && (
@@ -451,8 +453,8 @@ function CreateListing() {
                     id='discountedPrice'
                     value={discountedPrice}
                     onChange={onMutate}
-                    min='50'
-                    max='750000000'
+                    min='0'
+                    max='7500'
                     required={offer}
                   />
                 </>

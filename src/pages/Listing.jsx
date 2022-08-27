@@ -74,7 +74,7 @@ function Listing() {
       {shareLinkCopied && <p className='linkCopied'>Link Copied!</p>}
 
       <div className='listingDetails'>
-        <p className='listingName'>
+        {listing.type === 'sale'&&<p className='listingName'>
           {listing.name} - $
           {listing.offer
             ? listing.discountedPrice
@@ -83,10 +83,10 @@ function Listing() {
             : listing.regularPrice
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-        </p>
+        </p>}
         <p className='listingLocation'>{listing.location}</p>
         <p className='listingType'>
-          For {listing.type === 'rent' ? 'Rent' : 'Sale'}
+          For {listing.type === 'adoption' ? 'Adoption' : 'Sale'}
         </p>
         {listing.offer && (
           <p className='discountPrice'>
@@ -96,8 +96,8 @@ function Listing() {
 
         <ul className='listingDetailsList'>
           <li>
-            {listing.age > 1
-              ? `${listing.age} years old`
+            {listing.bedrooms > 1
+              ? `${listing.bedrooms} years old`
               : '1 year old'}
           </li>
           <li>
@@ -105,8 +105,13 @@ function Listing() {
               ? 'Male'
               : 'Female'}
           </li>
-          <li>{listing.parking && 'Parking Spot'}</li>
-          <li>{listing.furnished && 'Furnished'}</li>
+          <li>
+            {listing.gender ==='male'
+                ? ''
+                : `${listing.bathrooms} puppies`}
+          </li>
+          <li>{listing.parking && 'Neutered'}</li>
+          <li>{listing.furnished && 'Healthy'}</li>
         </ul>
 
         <p className='listingLocationTitle'>Location</p>
