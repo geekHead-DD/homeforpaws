@@ -21,6 +21,7 @@ function EditListing() {
   const [formData, setFormData] = useState({
     type: 'adoption',
     name: '',
+    contactnumber: '',
     bedrooms: 1,
     bathrooms: 0,
     parking: true,
@@ -40,6 +41,7 @@ function EditListing() {
     name,
     bedrooms,
     bathrooms,
+    contactnumber,
     parking,
     gender,
     furnished,
@@ -288,6 +290,18 @@ function EditListing() {
             minLength='10'
             required
           />
+
+        <label className='formLabel'>Contact Number</label>
+          <input
+            className='formInputName'
+            type='text'
+            id='contactnumber'
+            value={contactnumber}
+            onChange={onMutate}
+            maxLength='10'
+            minLength='10'
+            required
+          />  
 
           <div className='formRooms flex'>
             <div>

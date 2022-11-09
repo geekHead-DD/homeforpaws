@@ -114,6 +114,11 @@ function Listing() {
           <li>{listing.furnished && 'Healthy'}</li>
         </ul>
 
+        <p className='listingLocationTitle'><a id='contact' href="">Contact: {listing.contactnumber}</a></p>
+        <script>
+          var a = document.getElementById('yourlinkId'); //or grab it by tagname etc
+          a.href = "somelink url"
+        </script>
         <p className='listingLocationTitle'>Location</p>
 
         <div className='leafletContainer'>
